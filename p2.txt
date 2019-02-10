@@ -1,0 +1,59 @@
+
+                               Computer Systems
+                                  Project 2
+                                 Spring 2019
+
+
+turnin code:  cs_p2
+
+
+Write a collection of C functions that provide the functionality of a
+heap manager.
+
+These are the functions that you should provide:
+
+    void  heap_init(int num_pages_for_heap)
+
+    void *heap_alloc(int num_bytes_to_allocate)
+
+    void  heap_free(void *pointer_to_area_to_free)
+
+
+I will write a set of test programs which invoke your functions.
+
+The program must manage the space in a set of pages which you obtain via
+the mmap system call.  It should use the first-fit algorithm to allocate
+new space.
+
+The program must align requests on 16-byte addresses.
+
+The program will need to maintain data structures that minimally keep
+track of blocks of free space.  These data structures should *NOT* be
+in the allocated pages themselves.
+
+If the user frees two blocks of memory that are adjacent, your program
+should coalesce them.
+
+If the user attempts to allocate more space than is available in an open
+free block, then heap_alloc should return NULL.
+
+## THIS PART WILL NOT BE TESTED - but is provided in case the question arises:
+# If the user attempts to heap_free space that was not obtained via heap_alloc
+# then heap_free should return silently without freeing the space.
+
+BUILDING AND TESTING:
+    Your program will NOT include a main procedure; that will be supplied to
+    you in a source program named p2test.c  It will provide the ability to
+    test with the  -hw  command-line arg.
+
+    Your makefile should compile both your code and the source program named
+    p2test.c linking them into into a single executable named p2
+
+TURNIN info:
+    You should submit a tar file of a directory which contains all of the
+    required files (makefile, C source files, header files, etc).
+    Sample tar command to create a tar file from a dir:
+	tar cvf p2.tar ./p2dir  ## do *NOT* use full pathname of the dir
+    Your makefile should build an executable named p2.
+    Sample un-tar, build, and simple execution will be provided in a script
+    in p2testfiles/PREP.py.
