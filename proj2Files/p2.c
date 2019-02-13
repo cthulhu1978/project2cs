@@ -6,62 +6,63 @@
 #include <sys/types.h>
 #define PAGESIZE getpagesize()
 #define ALIGNMENT 16
+#define GET(p)       (*(unsigned int *)(p))
+#define PUT(p, val) (*(unsigned int *)(p) = (val))
+#define PACK(size, alloc) ((size) | (alloc))
+#define GET_SIZE(p)  (GET(p) & ~0x7)
+#define GET_ALLOC(p) (GET(p) & 0x1)
 void * region;
 int * heapStart;
 int * end;
 int * p;
 int len;
+int * next;
 
-typedef struct{
-  struct block * next;
-  char header;
-  int size;
-} block;
-
-//will mask out last bit to zero
-//int y = (x & -2);
-// Functions
+//will mask out last bit to zero ->>>>  int y = (x & -2);
 void heap_init(int num_pages_for_heap)
 {
-    unsigned int numBytesToAllocate = (num_pages_for_heap * PAGESIZE);
-    region = mmap(NULL, (PAGESIZE*num_pages_for_heap), PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0 );
+    int numBytesToAllocate = (num_pages_for_heap * PAGESIZE);
+    region = mmap(NULL, (numBytesToAllocate), PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0 );
     heapStart = region;
     end = (heapStart + numBytesToAllocate);
 
-    // Initialize the block:
-    memset(region, 0, numBytesToAllocate);
-    // Set last 16 as t;
+    // Initialize memory region to zero
+    for(int i = 0; i < numBytesToAllocate; i++){ *(heapStart+i) & 0; }
+
+    // Initialize whole memory with size and unallocated:
+    PUT(heapStart, PACK(numBytesToAllocate, 0));
+
     printf("WORKING CODE/heap_init: heapStart: %p + numBytesToAllocate: %d = end: %p\n", heapStart, numBytesToAllocate, end );
     printf("\n" );
 
 }
+
 // returns a pointer to a chunck of data at least as big as asked for. alligned to a 16 byte boundary
 // if num_bytes_to_allocate = zero return null/ if unsuccessful returns null and sets errno
 void *heap_alloc(int num_bytes_to_allocate)
 {
       // pads the data requested in case it is not a multiple of 16
-    if(num_bytes_to_allocate % ALIGNMENT != 0){ num_bytes_to_allocate += num_bytes_to_allocate%16; }
-    //printf("ABOUT TO allocate: %d\n", num_bytes_to_allocate );
-    len = num_bytes_to_allocate;
+    if(num_bytes_to_allocate % ALIGNMENT != 0){
+        len += num_bytes_to_allocate%16;
+      }
+
     p = heapStart;
-    printf("pointer p %p\n", p );
 
-    while( (p < end) && ((*p & 1) ||(*p <= len)) ) {
-      printf("(*p & -2): %d\n", (*p & -2) );
+    printf("GET_SIZE p: %d\n",GET_SIZE(p) );
+    printf("GET_ALLOC p: %d\n",GET_ALLOC(p) );
 
-      p = p + 100;//(*p & -2);
-      printf("pointer p in while loop %p \n",p );
+    //First FIt algorithm???
+    while( (p < end)
+            &&  ((*p & 1)
+            ||  (*p <= len)) )
+    {
+      p = p + (*p & -2);
+      //printf("P at time 50-> %p :  %d\n",p, *p );
     }
-
-    void * space = region;
-    //printf("P is set to Start: %p\n" , p);
-    //printf("NUm bytes allocated: %d\n",num_bytes_to_allocate );
-    return space;
-
-
-
-
+    printf("Heapstart:%p : heapend: %p\n",heapStart, end );
+    return p;
 }
+
 // returns bl;ock to pool of free memory
 void heap_free(void *pointer_to_area_to_free)
 {
@@ -69,12 +70,20 @@ void heap_free(void *pointer_to_area_to_free)
 }
 
 
-
+// allocate a free block if needs are less than required
 void addBlock(int * p, int len){
   int newsize = ((len + 1) >> 1) << 1; // round up to even
   int oldsize = (*p & -2);// mask out low bit
-  *p = newsize | 1;
-  if (newsize < oldsize){
+  *p = newsize | 1; // set new length
+  if (newsize < oldsize){ // set length in remaining part of the block
     *(p + newsize) = oldsize - newsize;
+  }
+}
+
+void free_block(int * p){
+  *p = *p & -2; // clear allocated flag
+  next = p + *p; // find next block
+  if( (*next & 1) == 0){
+    *p = *p + *next; // add to    this block if not allocated
   }
 }

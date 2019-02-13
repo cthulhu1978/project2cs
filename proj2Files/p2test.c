@@ -26,7 +26,7 @@ int main(int argc, char *argv[])
         exit(-1);
     }
     memset(p1,'X',2000);
-
+    
     p2 = (char *) heap_alloc(2000);
     if ((long int)p2 % 16 != 0)
     {
@@ -41,8 +41,8 @@ int main(int argc, char *argv[])
         printf("p3 bad %p  pmod16 %ld\n",p3,((long int)p3)%16);
         exit(-1);
     }
-    //memset(p3,'X',2000);
-    //
+    memset(p3,'X',2000);
+
     // p4 = (char *) heap_alloc(1000);
     // if ((long int)p4 % 16 != 0)
     // {
