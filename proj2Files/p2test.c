@@ -19,14 +19,14 @@ int main(int argc, char *argv[])
 
     heap_init(1);
 
-    p1 = (char *) heap_alloc(1000);
+    p1 = (char *) heap_alloc(256);
     if ((long int)p1 % 16 != 0)
     {
         printf("p1 bad %p  pmod16 %ld\n",p1,((long int)p1)%16);
         exit(-1);
     }
-    memset(p1,'X',2000);
-    
+    //memset(p1,'X',256);
+
     p2 = (char *) heap_alloc(2000);
     if ((long int)p2 % 16 != 0)
     {
