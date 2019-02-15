@@ -11,75 +11,80 @@
 // variables
 void * region;
 int * head;
-static unsigned int numByteCount;
+int numByteCount;
 bool wholeBlockalloc;
 // data structures
 typedef struct node {
   bool alloc;
-  unsigned int size;
-  struct node * this;
+  int size;
+  char * this;
   struct node * next;
 } node;
 
 struct node * p;
-
+struct node * newNode;
 //will mask out last bit to zero ->>>>  int y = (x & -2);
 void heap_init(int num_pages_for_heap)
 {
     // allocate bytes requried by init.
     int numBytesToAllocate = (num_pages_for_heap * PAGESIZE);
-    // set counter //
+    // set counter and allocate //
     numByteCount = numBytesToAllocate;
     region = mmap(NULL, (numBytesToAllocate), PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0 );
+
     // set head pointer //
     head = region;
     // set flag //
     wholeBlockalloc = false;
-    node header;
-    header.size = numBytesToAllocate;
-    header.this = region;
-    header.next = NULL;
-    header.alloc = false;
-    printf("head size %d\n",header.size );
-    p = header.this;
-    printf("header this: %p and next: %p\n", header.this, header.next );
-
+    //node newNode: //
+    newNode = (node *) malloc(sizeof(node));
+    printf("region this: %p and region end: %p\n", region, (region+numBytesToAllocate) );
+    newNode->size = numBytesToAllocate;
+    newNode->this = region; //printf("&newNode->this: %p and &newNode: %p\n",&newNode->this, &newNode );
+    newNode->next = NULL; //printf("&newNode->next: %p AND newNode->next: %p\n",&newNode->next, newNode->next );
+    newNode->alloc = false; //printf("&newNode->alloc: %p AND newNode->alloc: %d\n",&newNode->alloc, newNode->alloc );
+    //p = newNode;
 }
 
 // returns a pointer to a chunck of data at least as big as asked for. alligned to a 16 byte boundary
 // if num_bytes_to_allocate = zero return null/ if unsuccessful returns null and sets errno
 void *heap_alloc(int num_bytes_to_allocate)
 {
-  ////////////////////////////////////////////////////////////////////////////////////////
-  // set flag if whole block is allocated //
-  if(num_bytes_to_allocate > numByteCount){wholeBlockalloc == true;}
-  printf("if num bytes allocate\n" );
+  //if(num_bytes_to_allocate % 16 != 0){num_bytes_to_allocate += num_bytes_to_allocate%16;}
+  p = newNode;
+  if(num_bytes_to_allocate % ALIGNMENT != 0){
+    int bytes = num_bytes_to_allocate / 16 + 1;
+    num_bytes_to_allocate = bytes * 16;
+  }
+  if(num_bytes_to_allocate > numByteCount) { wholeBlockalloc == true;}
+
+  while(p->next != NULL){
+    p = (p->next);
+    printf("LOOP p &&&: %p & p->next: %p\n",p, p->next );
+    }
+
   // if current block is not allocated and the the bloc still has bytes to give up //
   if( (p->alloc == false) && (numByteCount > num_bytes_to_allocate)){
-    // set size to num bytes needed and flip allocated bit, set next to null to tack on another node;
+    numByteCount = (numByteCount - num_bytes_to_allocate);
+    printf("(1st if)numByteCount left after request: %d\n",numByteCount );
     p->size = num_bytes_to_allocate;
     p->alloc = true;
-    p->next = NULL;
-    // decrement
-    numByteCount = (numByteCount - num_bytes_to_allocate);
+    printf("p->this: %p\n", p->this );
+    return p->this;
   } else {
-    printf("else works\n" );
     // traverse nodes
-    printf("p->next %p\n", p );
-    while(p->next != NULL){
-    printf("while works\n" );
-      p = (p->next);
-    }
-    if(p->next == NULL && wholeBlockalloc != true){
-      if(num_bytes_to_allocate < numByteCount){
-        node * newNode = (node *) malloc(sizeof(node));
-        p->next = newNode;
-        newNode->size = num_bytes_to_allocate;
-        newNode->alloc = true;
-        newNode->next = NULL;
-        newNode->this = (p->this + num_bytes_to_allocate);
-        return newNode->this;
-      }
+  if( (p->next == NULL) && (wholeBlockalloc != true) && (numByteCount > num_bytes_to_allocate) ){
+        node * finalNode = (node *) malloc(sizeof(node));
+        numByteCount = (numByteCount - num_bytes_to_allocate);
+        printf("(2nd if)numByteCount left after request: %d\n",numByteCount );
+        p->next = finalNode;
+        finalNode->size = num_bytes_to_allocate;
+        finalNode->this = (p->this + (num_bytes_to_allocate) );
+        finalNode->alloc = true;
+        finalNode->next = NULL;
+        free(p);
+        return finalNode->this;
+
     } else {
       return NULL;
     }
@@ -91,5 +96,6 @@ void *heap_alloc(int num_bytes_to_allocate)
 // returns bl;ock to pool of free memory
 void heap_free(void *pointer_to_area_to_free)
 {
+    free(pointer_to_area_to_free);
     return;
 }
