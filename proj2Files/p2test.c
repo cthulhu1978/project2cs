@@ -26,7 +26,7 @@ int main(int argc, char *argv[])
         exit(-1);
     }
     memset(p1,'X',2000);
-    printf("p1 is %p and val is: %c\n\n", p1, *(p1+15) );
+    //printf("p1 is %p and val is: %c\n\n", p1, *(p1+15) );
 
 
 /////////////////////////////////////////////////////////////////
@@ -37,7 +37,7 @@ int main(int argc, char *argv[])
         exit(-1);
     }
     memset(p2,'X',2000);
-    printf("p2 is %p and val is: %c\n\n", p2, *(p2+15) );
+    //printf("p2 is %p and val is: %c\n\n", p2, *(p2+15) );
 
 
 ////////////////////////////////////////////////////////////////////
@@ -48,7 +48,7 @@ int main(int argc, char *argv[])
         exit(-1);
     }
     memset(p3,'X',2000);
-    printf("p3 is %p and val is: %c\n\n", p3, *(p3+15) );
+    //printf("p3 is %p and val is: %c\n\n", p3, *(p3+15) );
 
 
 /////////////////////////////////////////////////////
@@ -59,7 +59,7 @@ int main(int argc, char *argv[])
         exit(-1);
     }
     memset(p4,'X',1000);
-    printf("p4 is %p and val is: %c\n\n", p4, *(p4+999) );
+    //printf("p4 is %p and val is: %c\n\n", p4, *(p4+999) );
 
     p5 = (char *) heap_alloc(1000);
     if ((long int)p5 % 16 != 0)
@@ -85,7 +85,7 @@ int main(int argc, char *argv[])
     }
     memset(p6,'X',50);
     //
-    // printf("DONE\n");
+    printf("DONE\n");
 
     return 0;
 }
