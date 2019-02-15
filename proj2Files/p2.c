@@ -50,18 +50,18 @@ void heap_init(int num_pages_for_heap)
 // if num_bytes_to_allocate = zero return null/ if unsuccessful returns null and sets errno
 void *heap_alloc(int num_bytes_to_allocate)
 {
-  //if(num_bytes_to_allocate % 16 != 0){num_bytes_to_allocate += num_bytes_to_allocate%16;}
   p = newNode;
+  
   if(num_bytes_to_allocate % ALIGNMENT != 0){
     int bytes = num_bytes_to_allocate / 16 + 1;
     num_bytes_to_allocate = bytes * 16;
   }
-  if(num_bytes_to_allocate > numByteCount) { wholeBlockalloc == true;}
-
-  while(p->next != NULL){
-    p = (p->next);
-    printf("LOOP p &&&: %p & p->next: %p\n",p, p->next );
+  if(num_bytes_to_allocate > numByteCount)
+    {
+      wholeBlockalloc == true;
+      printf("BLOCK IS FULLY allocated\n" );
     }
+
 
   // if current block is not allocated and the the bloc still has bytes to give up //
   if( (p->alloc == false) && (numByteCount > num_bytes_to_allocate)){
@@ -73,6 +73,10 @@ void *heap_alloc(int num_bytes_to_allocate)
     return p->this;
   } else {
     // traverse nodes
+  while(p->next != NULL){
+    p = (p->next);
+    printf("LOOP p &&&: %p & p->next: %p\n",p, p->next );
+    }
   if( (p->next == NULL) && (wholeBlockalloc != true) && (numByteCount > num_bytes_to_allocate) ){
         node * finalNode = (node *) malloc(sizeof(node));
         numByteCount = (numByteCount - num_bytes_to_allocate);

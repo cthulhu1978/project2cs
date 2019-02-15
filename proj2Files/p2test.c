@@ -17,37 +17,37 @@ int main(int argc, char *argv[])
         exit(0);
     }
 
-    heap_init(1);
+    heap_init(2);
 
-    p1 = (char *) heap_alloc(16);
+    p1 = (char *) heap_alloc(2000);
     if ((long int)p1 % 16 != 0)
     {
         printf("p1 bad %p  pmod16 %ld\n",p1,((long int)p1)%16);
         exit(-1);
     }
-    memset(p1,'X',16);
+    memset(p1,'X',2000);
     printf("p1 is %p and val is: %c\n\n", p1, *(p1+15) );
 
 
 /////////////////////////////////////////////////////////////////
-    p2 = (char *) heap_alloc(16);
+    p2 = (char *) heap_alloc(2000);
     if ((long int)p2 % 16 != 0)
     {
         printf("p2 bad %p  pmod16 %ld\n",p2,((long int)p2)%16);
         exit(-1);
     }
-    memset(p2,'X',16);
+    memset(p2,'X',2000);
     printf("p2 is %p and val is: %c\n\n", p2, *(p2+15) );
 
 
 ////////////////////////////////////////////////////////////////////
-    p3 = (char *) heap_alloc(1000);
+    p3 = (char *) heap_alloc(2000);
     if ((long int)p3 % 16 != 0)
     {
         printf("p3 bad %p  pmod16 %ld\n\n",p3,((long int)p3)%16);
         exit(-1);
     }
-    memset(p3,'X',1000);
+    memset(p3,'X',2000);
     printf("p3 is %p and val is: %c\n\n", p3, *(p3+15) );
 
 
@@ -77,13 +77,13 @@ int main(int argc, char *argv[])
         exit(-1);
     }
 
-    // p6 = (char *) heap_alloc(50);   // then just get 50
-    // if ((long int)p6 % 16 != 0)
-    // {
-    //     printf("p6 bad %p  pmod16 %d\n",p6,((long int)p6)%16);
-    //     exit(-1);
-    // }
-    // memset(p6,'X',50);
+    p6 = (char *) heap_alloc(50);   // then just get 50
+    if ((long int)p6 % 16 != 0)
+    {
+        printf("p6 bad %p  pmod16 %d\n",p6,((long int)p6)%16);
+        exit(-1);
+    }
+    memset(p6,'X',50);
     //
     // printf("DONE\n");
 
